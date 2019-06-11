@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 """
+<<<<<<< HEAD
 This module prepare the input names and create model object.
 """
 import os
@@ -16,12 +17,30 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, History
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Bidirectional, Dropout
+=======
+This module creates model object.
+"""
+import os
+import logging
+import numpy as np
+from subprocess import Popen, PIPE
+from .utils import log_config, setup_logging
+from genderteller import PARENT_DIR, gender_class, gender_cutoff
+from sklearn.model_selection import train_test_split
+import tensorflow.keras.backend as K
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import model_from_json
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, History
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Bidirectional, Dropout
+from .encoder import GenderEncoder, NameEncoder, KerasBatchGenerator
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
 
 
 setup_logging(log_config)
 logger = logging.getLogger(__name__)
 
 
+<<<<<<< HEAD
 class KerasBatchGenerator(object):
 
     def __init__(self, data, label, batch_size):
@@ -158,6 +177,18 @@ class CharBiLSTM(object):
     _classifier_backup_name = 'gender_model_backup.h5'
     _classifier_path = os.path.join(PARENT_DIR, 'models', _classifier_file_name)
     _classifier_backup_path = os.path.join(PARENT_DIR, 'models', _classifier_backup_name)
+=======
+class CharBiLSTM(object):
+    """ Character-based bi-directional LSTM model. """
+    _classifier_weights_file_name = 'gender_model_weights.h5'
+    _classifier_graph_file_name = 'model_graph.json'
+    _classifier_weights_next_name = 'gender_model_weights_next.h5'
+    _classifier_graph_next_name = 'model_graph_next.json'
+    _classifier_weights_path = os.path.join(PARENT_DIR, 'models', _classifier_weights_file_name)
+    _classifier_graph_path = os.path.join(PARENT_DIR, 'models', _classifier_graph_file_name)
+    _classifier_weights_next_path = os.path.join(PARENT_DIR, 'models', _classifier_weights_next_name)
+    _classifier_graph_next_path = os.path.join(PARENT_DIR, 'models', _classifier_graph_next_name)
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
 
     def __init__(self, lower=True, pad_size=103, padding='post', embedding_size=256, lstm_size1=128, lstm_size2=128,
                  lstm_dropout1=0.2, lstm_dropout2=0.2, output_dim=1, optimizer='adam', loss='binary_crossentropy',
@@ -194,8 +225,14 @@ class CharBiLSTM(object):
 
         return encoded_genders
 
+<<<<<<< HEAD
     def train(self, names, genders, split_rate=0.2, batch_size=128, patience=5, model_path=_classifier_path,
               save_best_only=True, epochs=100):
+=======
+    def train(self, names, genders, split_rate=0.2, batch_size=128, patience=5,
+              model_weight_path=_classifier_weights_path, model_graph_path=_classifier_graph_path,
+              save_best_only=True, save_weights_only=True, epochs=100):
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
         """ Train the LSTM model. """
         names = self._encode_name(names, True)
         genders = self._encode_gender(genders, True)
@@ -205,7 +242,12 @@ class CharBiLSTM(object):
         valid_gtr = KerasBatchGenerator(X_valid, y_valid, valid_batch_size)
 
         earlystop = EarlyStopping(patience=patience)
+<<<<<<< HEAD
         checkpoint = ModelCheckpoint(model_path, save_best_only=save_best_only)
+=======
+        checkpoint = ModelCheckpoint(model_weight_path, save_best_only=save_best_only,
+                                     save_weights_only=save_weights_only)
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
         history = History()
 
         model = Sequential()
@@ -224,6 +266,7 @@ class CharBiLSTM(object):
             logger.info(f"Epoch={epoch + 1}, "
                         f"{', '.join(f'{key}={value[epoch]}' for key, value in model.history.history.items())}")
 
+<<<<<<< HEAD
     def load(self, model_path=_classifier_path):
         """ Load the existing master model. """
         self._model = load_model(model_path)
@@ -233,18 +276,51 @@ class CharBiLSTM(object):
         """ This function keep the original model, update the model and save it as default model. """
         names = self._encode_name(names, True)
         genders = self._encode_gender(genders, True)
+=======
+        # Save the model structure.
+        with open(model_graph_path, 'w') as f:
+            f.write(model.to_json())
+
+        # Load the trained model.
+        self._model = model
+
+    def load(self, model_weights_path=_classifier_weights_path, model_graph_path=_classifier_graph_path):
+        """ Load the existing master model. """
+        K.clear_session()
+        with open(model_graph_path, 'r') as f:
+            model_graph = f.read()
+        self._model = model_from_json(model_graph)
+        self._model.load_weights(model_weights_path)
+
+    def update(self, names, genders, split_rate=0.2, batch_size=64, patience=1,
+               model_weights_next_path=_classifier_weights_next_path,
+               model_graph_next_path=_classifier_graph_next_path,
+               save_best_only=True, save_weights_only=True, epochs=2):
+        """ This function keep the original model, update the model and save it as default model. """
+        names = self._encode_name(names)
+        genders = self._encode_gender(genders)
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
         X_train, X_valid, y_train, y_valid = train_test_split(names, genders, test_size=split_rate)
         valid_batch_size = min(batch_size, len(X_valid) // 3)
         train_gtr = KerasBatchGenerator(X_train, y_train, batch_size)
         valid_gtr = KerasBatchGenerator(X_valid, y_valid, valid_batch_size)
 
         earlystop = EarlyStopping(patience=patience)
+<<<<<<< HEAD
         checkpoint = ModelCheckpoint(model_path, save_best_only=save_best_only)
+=======
+        checkpoint = ModelCheckpoint(model_weights_next_path, save_best_only=save_best_only,
+                                     save_weights_only=save_weights_only)
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
         history = History()
 
         if not self._model:
             self.load()
+<<<<<<< HEAD
         self._model.save(self._classifier_backup_path)
+=======
+
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
         self._model.fit_generator(train_gtr.generate(), len(X_train) // batch_size, epochs=epochs,
                                   validation_data=valid_gtr.generate(), validation_steps=len(X_valid) // valid_batch_size,
                                   callbacks=[earlystop, checkpoint, history])
@@ -252,6 +328,20 @@ class CharBiLSTM(object):
             logger.info(f"Epoch={epoch + 1}, "
                         f"{', '.join(f'{key}={value[epoch]}' for key, value in self._model.history.history.items())}")
 
+<<<<<<< HEAD
+=======
+        # Save the model structure.
+        with open(model_graph_next_path, 'w') as f:
+            f.write(self._model.to_json())
+
+    def overwrite(self):
+        """This function copy the next model version to overwrite the current version."""
+        move_file = Popen(f'cp {self._classifier_weights_next_path} {self._classifier_weights_path}; '
+                          f'cp {self._classifier_graph_next_path} {self._classifier_graph_path}',
+                          shell=True, stdout=PIPE, executable='/bin/bash')
+        move_file.communicate()
+
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
     def predict(self, names, return_prob=False, ptv_cutoff=gender_cutoff[1], ntv_cutoff=gender_cutoff[0]):
         """ This function predicts the gender with given names. """
         if not self._model:

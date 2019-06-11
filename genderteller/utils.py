@@ -30,7 +30,11 @@ log_config = {
     },
 
     "loggers": {
+<<<<<<< HEAD
         "api": {
+=======
+        "endpoint_api": {
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
             "level": "ERROR",
             "handlers": ["console"],
             "propagate": "no"

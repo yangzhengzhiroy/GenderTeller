@@ -16,16 +16,28 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense, Bidirectional, Dropo
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
+<<<<<<< HEAD
 def encode(name_ls):
     """
     Encode list of names into list of list of character IDs using the character encoder.
     :param name_ls: list of names
+=======
+def encode(name_ls, char_encoder):
+    """
+    Encode list of names into list of list of character IDs using the character encoder.
+    :param name_ls: list of names
+    :param char_encoder: LabelEncoder(), character encoder
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
     :return: list (each name) of list (each word) of character IDs
     """
     name_id2word_id2char_ids = []
     for name in name_ls:
         name = list(name)
+<<<<<<< HEAD
         name_id2word_id2char_ids.append(encoder.transform(['^'] + name + ['$']).tolist())
+=======
+        name_id2word_id2char_ids.append(char_encoder.transform(['^'] + name + ['$']).tolist())
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
     return name_id2word_id2char_ids
 
 
@@ -54,21 +66,37 @@ with open('init_epoch.json', 'r') as f:
 init_epoch = init_epoch['epoch']
 data_df = pd.read_csv('data/final_data.csv')
 data_df = data_df.dropna()
+<<<<<<< HEAD
 encoder = LabelEncoder()
 characters = list(set(''.join(data_df['full_name'])))
 characters = ['^', '$'] + characters
 encoder.fit(characters)
 with open('char_encoder.pkl', 'wb') as f:
     pickle.dump(encoder, f, protocol=pickle.HIGHEST_PROTOCOL)
+=======
+charencoder = LabelEncoder()
+characters = list(set(''.join(data_df['full_name'])))
+characters = ['^', '$'] + characters
+charencoder.fit(characters)
+with open('char_encoder.pkl', 'wb') as f:
+    pickle.dump(charencoder, f, protocol=pickle.HIGHEST_PROTOCOL)
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
 print('10%')
 
 index = np.arange(0, len(data_df.index))
 np.random.seed(123)
 np.random.shuffle(index)
+<<<<<<< HEAD
 names, genders = data_df['full_name'].values[index], data_df['GenderTeller'].values[index]
 names = encode(names)
 max_len = 103
 names = pad_sequences(names, padding='post')
+=======
+names, genders = data_df['full_name'].values[index], data_df['gender'].values[index]
+names = encode(names, charencoder)
+max_len = 103
+names = pad_sequences(names, max_len, padding='post')
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
 print(names.shape)
 print('20%')
 
@@ -89,7 +117,11 @@ history = History()
 """
 model = Sequential()
 model.add(Embedding(len(characters), output_dim=256))
+<<<<<<< HEAD
 model.add(Bidirectional(LSTM(128, return_sequences=True), input_shape=(80, 39, 256)))
+=======
+model.add(Bidirectional(LSTM(128, return_sequences=True)))
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
 model.add(Dropout(rate=0.2))
 model.add(Bidirectional(LSTM(128)))
 model.add(Dropout(rate=0.2))
@@ -97,8 +129,13 @@ model.add(Dense(1, activation='sigmoid'))
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 print('50%')
 """
+<<<<<<< HEAD
 model = load_model('gender_model.h5')
 model.fit_generator(X_train_gen.generate(), len(X_train) // 128, epochs=init_epoch + 10,
+=======
+model = load_model('models/gender_model.h5')
+model.fit_generator(X_train_gen.generate(), len(X_train) // 128, epochs=init_epoch + 1,
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
                     validation_data=X_test_gen.generate(), validation_steps=len(X_test) // 128,
                     callbacks=[earlystop, checkpoint, history], initial_epoch=init_epoch)
 print('80%')

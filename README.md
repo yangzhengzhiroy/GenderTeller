@@ -3,8 +3,14 @@
 ## Installation
 
 ```bash
+<<<<<<< HEAD
 python setup.py build
 python setup.py build
+=======
+tar -xvf GenderTeller*.tar.gz
+cd GenderTeller*/
+python setup.py install
+>>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
 ```
 
 ## API usage.
