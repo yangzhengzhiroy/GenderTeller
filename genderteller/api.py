@@ -1,11 +1,7 @@
 import logging
 from .utils import log_config, setup_logging
 from .classifier import CharBiLSTM
-<<<<<<< HEAD
-from genderteller import gender_cutoff
-=======
 from genderteller import gender_cutoff, gender_class
->>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
 
 
 setup_logging(log_config)
@@ -16,12 +12,8 @@ char_model = CharBiLSTM()
 def predict_genders(names, return_prob=False, ptv_cutoff=gender_cutoff[1], ntv_cutoff=gender_cutoff[0]):
     """ The function predicts genders and probabilities based on names. """
     try:
-<<<<<<< HEAD
-        return char_model.predict(names, return_prob, ptv_cutoff, ntv_cutoff)
-=======
         if names:
             return char_model.predict(names, return_prob, ptv_cutoff, ntv_cutoff)
->>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
     except Exception as e:
         logger.exception(f'predict_genders: {e}')
 
@@ -31,10 +23,7 @@ def predict_gender(name, return_prob=False, ptv_cutoff=gender_cutoff[1], ntv_cut
         output = predict_genders([name], return_prob, ptv_cutoff, ntv_cutoff)
         if output:
             return output[0]
-<<<<<<< HEAD
-=======
         else:
             return gender_class['unk']
->>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
     except Exception as e:
         logger.exception(f'predict_gender: {e}')
