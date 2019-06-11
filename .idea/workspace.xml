@@ -8,6 +8,7 @@
       <change beforePath="$PROJECT_DIR$/genderteller/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genderteller/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genderteller/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/genderteller/api.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genderteller/classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/genderteller/classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genderteller/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/genderteller/utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,32 +17,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/genderteller/api.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-              <folding>
-                <element signature="e#0#14#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/genderteller/classifier.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="499">
-              <caret line="299" column="34" selection-start-line="299" selection-start-column="34" selection-end-line="299" selection-end-column="34" />
-              <folding>
-                <element signature="e#93#102#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="375" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -53,6 +29,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>genders</find>
+      <find>__ini</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -62,10 +39,10 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/preprocessing.py" />
-        <option value="$PROJECT_DIR$/genderteller/utils.py" />
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/genderteller/__init__.py" />
         <option value="$PROJECT_DIR$/genderteller/api.py" />
+        <option value="$PROJECT_DIR$/genderteller/utils.py" />
         <option value="$PROJECT_DIR$/genderteller/classifier.py" />
       </list>
     </option>
@@ -138,7 +115,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24986301" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -176,16 +152,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/preprocessing.py" />
-    <entry file="file://$PROJECT_DIR$/genderteller/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1040">
-          <caret line="53" selection-start-line="53" selection-end-line="53" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MANIFEST.in">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -203,16 +169,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-288" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/genderteller/encoder.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2909" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/genderteller/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="384">
@@ -220,10 +176,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/genderteller/api.py">
+    <entry file="file://$PROJECT_DIR$/genderteller/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        <state relative-caret-position="403">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
@@ -232,11 +188,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/genderteller/classifier.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="499">
-          <caret line="299" column="34" selection-start-line="299" selection-start-column="34" selection-end-line="299" selection-end-column="34" />
+        <state relative-caret-position="-720">
+          <caret line="15" column="68" selection-start-line="15" selection-start-column="68" selection-end-line="15" selection-end-column="68" />
           <folding>
             <element signature="e#93#102#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/genderteller/encoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2808" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/genderteller/api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="2" column="34" lean-forward="true" selection-start-line="2" selection-start-column="34" selection-end-line="2" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24">
+          <caret line="1" column="2" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
         </state>
       </provider>
     </entry>
