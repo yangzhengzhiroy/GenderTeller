@@ -12,6 +12,7 @@ logs/
 .idea/
 .git/
 models/
+**/models/
 models_local/
 industryguesser/models/
 data/

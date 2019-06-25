@@ -25,13 +25,6 @@ setup(
     ],
     packages=find_packages(),
     install_requires=requirements,
-<<<<<<< HEAD
     include_package_data=True,
-    package_data={
-        '': ['models/*']
-    },
-    data_files=[('models', ['char_encoder.pkl', 'gender_encoder.pkl', 'gender_model.h5'])]
-=======
-    include_package_data=True
->>>>>>> 4fe210c4f225ae30b22b0fbeab56621621b768ea
+    long_description_content_type='text/markdown'
 )

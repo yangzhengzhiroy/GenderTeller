@@ -37,7 +37,7 @@ class KerasBatchGenerator(object):
 class GenderEncoder(object):
     """ Encode the gender to categories. """
     _gender_encoder_file_name = 'gender_encoder.pkl'
-    _encoder_path = os.path.join(PARENT_DIR, 'models', _gender_encoder_file_name)
+    _encoder_path = os.path.join(PARENT_DIR, 'genderteller/models', _gender_encoder_file_name)
 
     def __init__(self):
         self._gender_encoder = None
@@ -76,7 +76,7 @@ class NameEncoder(object):
     _start_char = '^'
     _end_char = '$'
     _char_encoder_file_name = 'char_encoder.pkl'
-    _encoder_path = os.path.join(PARENT_DIR, 'models', _char_encoder_file_name)
+    _encoder_path = os.path.join(PARENT_DIR, 'genderteller/models', _char_encoder_file_name)
 
     def __init__(self, lower=True, pad_size=103, padding='post'):
         self._lower = lower

@@ -8,6 +8,7 @@ import numpy as np
 from .utils import log_config, setup_logging
 from genderteller import PARENT_DIR, gender_class, gender_cutoff
 from sklearn.model_selection import train_test_split
+import tensorflow as tf
 import tensorflow.keras.backend as K
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.models import model_from_json
@@ -26,10 +27,10 @@ class CharBiLSTM(object):
     _classifier_graph_file_name = 'model_graph.json'
     _classifier_weights_backup_name = 'gender_model_weights_backup.h5'
     _classifier_graph_backup_name = 'model_graph_backup.json'
-    _classifier_weights_path = os.path.join(PARENT_DIR, 'models', _classifier_weights_file_name)
-    _classifier_graph_path = os.path.join(PARENT_DIR, 'models', _classifier_graph_file_name)
-    _classifier_weights_backup_path = os.path.join(PARENT_DIR, 'models', _classifier_weights_backup_name)
-    _classifier_graph_backup_path = os.path.join(PARENT_DIR, 'models', _classifier_graph_backup_name)
+    _classifier_weights_path = os.path.join(PARENT_DIR, 'genderteller/models', _classifier_weights_file_name)
+    _classifier_graph_path = os.path.join(PARENT_DIR, 'genderteller/models', _classifier_graph_file_name)
+    _classifier_weights_backup_path = os.path.join(PARENT_DIR, 'genderteller/models', _classifier_weights_backup_name)
+    _classifier_graph_backup_path = os.path.join(PARENT_DIR, 'genderteller/models', _classifier_graph_backup_name)
 
     def __init__(self, lower=True, pad_size=103, padding='post', embedding_size=256, lstm_size1=128, lstm_size2=128,
                  lstm_dropout1=0.2, lstm_dropout2=0.2, output_dim=1, optimizer='adam', loss='binary_crossentropy',
@@ -46,6 +47,8 @@ class CharBiLSTM(object):
         self._name_encoder = NameEncoder(lower, pad_size, padding)
         self._char_size = None
         self._gender_encoder = GenderEncoder()
+        self.graph = tf.get_default_graph()
+        self.sess = tf.Session()
         self._model = None
 
     def _encode_name(self, names, fit=False):
@@ -103,15 +106,19 @@ class CharBiLSTM(object):
             f.write(model.to_json())
 
         # Load the trained model.
-        self._model = model
+        with self.graph.as_default():
+            with self.sess.as_default():
+                self._model = model
 
     def load(self, model_weights_path=_classifier_weights_path, model_graph_path=_classifier_graph_path):
         """ Load the existing master model. """
         K.clear_session()
         with open(model_graph_path, 'r') as f:
             model_graph = f.read()
-        self._model = model_from_json(model_graph)
-        self._model.load_weights(model_weights_path)
+        with self.graph.as_default():
+            with self.sess.as_default():
+                self._model = model_from_json(model_graph)
+                self._model.load_weights(model_weights_path)
 
     def update(self, names, genders, split_rate=0.2, batch_size=64, patience=1,
                model_weights_path=_classifier_weights_path, model_graph_path=_classifier_graph_path,
@@ -155,7 +162,9 @@ class CharBiLSTM(object):
         if not self._model:
             self.load()
         names = self._encode_name(names)
-        y_pred_prob = self._model.predict(names)
+        with self.graph.as_default():
+            with self.sess.as_default():
+                y_pred_prob = self._model.predict(names)
         y_pred_prob = y_pred_prob.flatten()
         y_pred = np.where(y_pred_prob >= ptv_cutoff, gender_class[1],
                           np.where(y_pred_prob >= ntv_cutoff, gender_class['unk'], gender_class[0]))
