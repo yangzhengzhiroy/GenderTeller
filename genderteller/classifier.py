@@ -47,8 +47,8 @@ class CharBiLSTM(object):
         self._name_encoder = NameEncoder(lower, pad_size, padding)
         self._char_size = None
         self._gender_encoder = GenderEncoder()
-        self.graph = tf.get_default_graph()
-        self.sess = tf.Session()
+        self._graph = tf.get_default_graph()
+        self._sess = tf.Session()
         self._model = None
 
     def _encode_name(self, names, fit=False):
@@ -106,8 +106,8 @@ class CharBiLSTM(object):
             f.write(model.to_json())
 
         # Load the trained model.
-        with self.graph.as_default():
-            with self.sess.as_default():
+        with self._graph.as_default():
+            with self._sess.as_default():
                 self._model = model
 
     def load(self, model_weights_path=_classifier_weights_path, model_graph_path=_classifier_graph_path):
@@ -115,8 +115,8 @@ class CharBiLSTM(object):
         K.clear_session()
         with open(model_graph_path, 'r') as f:
             model_graph = f.read()
-        with self.graph.as_default():
-            with self.sess.as_default():
+        with self._graph.as_default():
+            with self._sess.as_default():
                 self._model = model_from_json(model_graph)
                 self._model.load_weights(model_weights_path)
 
@@ -162,8 +162,8 @@ class CharBiLSTM(object):
         if not self._model:
             self.load()
         names = self._encode_name(names)
-        with self.graph.as_default():
-            with self.sess.as_default():
+        with self._graph.as_default():
+            with self._sess.as_default():
                 y_pred_prob = self._model.predict(names)
         y_pred_prob = y_pred_prob.flatten()
         y_pred = np.where(y_pred_prob >= ptv_cutoff, gender_class[1],
