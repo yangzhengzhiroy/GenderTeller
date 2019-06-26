@@ -8,7 +8,6 @@ import numpy as np
 from .utils import log_config, setup_logging
 from genderteller import PARENT_DIR, gender_class, gender_cutoff
 from sklearn.model_selection import train_test_split
-import tensorflow as tf
 import tensorflow.keras.backend as K
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.models import model_from_json
@@ -47,8 +46,6 @@ class CharBiLSTM(object):
         self._name_encoder = NameEncoder(lower, pad_size, padding)
         self._char_size = None
         self._gender_encoder = GenderEncoder()
-        self._graph = tf.get_default_graph()
-        self._sess = tf.Session()
         self._model = None
 
     def _encode_name(self, names, fit=False):
@@ -106,19 +103,15 @@ class CharBiLSTM(object):
             f.write(model.to_json())
 
         # Load the trained model.
-        with self._graph.as_default():
-            with self._sess.as_default():
-                self._model = model
+        self._model = model
 
     def load(self, model_weights_path=_classifier_weights_path, model_graph_path=_classifier_graph_path):
         """ Load the existing master model. """
         K.clear_session()
         with open(model_graph_path, 'r') as f:
             model_graph = f.read()
-        with self._graph.as_default():
-            with self._sess.as_default():
-                self._model = model_from_json(model_graph)
-                self._model.load_weights(model_weights_path)
+        self._model = model_from_json(model_graph)
+        self._model.load_weights(model_weights_path)
 
     def update(self, names, genders, split_rate=0.2, batch_size=64, patience=1,
                model_weights_path=_classifier_weights_path, model_graph_path=_classifier_graph_path,
@@ -162,9 +155,7 @@ class CharBiLSTM(object):
         if not self._model:
             self.load()
         names = self._encode_name(names)
-        with self._graph.as_default():
-            with self._sess.as_default():
-                y_pred_prob = self._model.predict(names)
+        y_pred_prob = self._model.predict(names)
         y_pred_prob = y_pred_prob.flatten()
         y_pred = np.where(y_pred_prob >= ptv_cutoff, gender_class[1],
                           np.where(y_pred_prob >= ntv_cutoff, gender_class['unk'], gender_class[0]))
