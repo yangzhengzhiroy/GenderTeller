@@ -82,28 +82,25 @@ class CharBiLSTM(object):
                                      save_weights_only=save_weights_only)
         history = History()
 
-        model = Sequential()
-        model.add(Embedding(self._name_encoder.char_size, output_dim=self._embedding_size))
-        model.add(Bidirectional(LSTM(self._lstm_size1, return_sequences=True)))
-        model.add(Dropout(rate=self._lstm_dropout1))
-        model.add(Bidirectional(LSTM(self._lstm_size2)))
-        model.add(Dropout(rate=self._lstm_dropout2))
-        model.add(Dense(self._output_dim, activation='sigmoid'))
-        model.compile(optimizer=self._optimizer, loss=self._loss, metrics=self._metrics)
+        self._model = Sequential()
+        self._model.add(Embedding(self._name_encoder.char_size + 1, output_dim=self._embedding_size))
+        self._model.add(Bidirectional(LSTM(self._lstm_size1, return_sequences=True)))
+        self._model.add(Dropout(rate=self._lstm_dropout1))
+        self._model.add(Bidirectional(LSTM(self._lstm_size2)))
+        self._model.add(Dropout(rate=self._lstm_dropout2))
+        self._model.add(Dense(self._output_dim, activation='sigmoid'))
+        self._model.compile(optimizer=self._optimizer, loss=self._loss, metrics=self._metrics)
 
-        model.fit_generator(train_gtr.generate(), len(X_train) // batch_size, epochs=epochs,
-                            validation_data=valid_gtr.generate(), validation_steps=len(X_valid) // valid_batch_size,
-                            callbacks=[earlystop, checkpoint, history])
-        for epoch in np.arange(0, len(model.history.history['loss'])):
+        self._model.fit_generator(train_gtr.generate(), len(X_train) // batch_size, epochs=epochs,
+                                  validation_data=valid_gtr.generate(), validation_steps=len(X_valid) // valid_batch_size,
+                                  callbacks=[earlystop, checkpoint, history])
+        for epoch in np.arange(0, len(self._model.history.history['loss'])):
             logger.info(f"Epoch={epoch + 1}, "
-                        f"{', '.join(f'{key}={value[epoch]}' for key, value in model.history.history.items())}")
+                        f"{', '.join(f'{key}={value[epoch]}' for key, value in self._model.history.history.items())}")
 
         # Save the model structure.
         with open(model_graph_path, 'w') as f:
-            f.write(model.to_json())
-
-        # Load the trained model.
-        self._model = model
+            f.write(self._model.to_json())
 
     def load(self, model_weights_path=_classifier_weights_path, model_graph_path=_classifier_graph_path):
         """ Load the existing master model. """
@@ -156,6 +153,49 @@ class CharBiLSTM(object):
             self.load()
         names = self._encode_name(names)
         y_pred_prob = self._model.predict(names)
+        y_pred_prob = y_pred_prob.flatten()
+        y_pred = np.where(y_pred_prob >= ptv_cutoff, gender_class[1],
+                          np.where(y_pred_prob >= ntv_cutoff, gender_class['unk'], gender_class[0]))
+
+        if return_prob:
+            return [{'gender': pred, gender_class[1]: prob, gender_class[0]: 1 - prob}
+                    for pred, prob in zip(y_pred, y_pred_prob)]
+        else:
+            return y_pred.tolist()
+
+
+class GenderModel(object):
+    """ Character-based bi-directional LSTM model. """
+    _classifier_weights_file_name = 'gender_model_weights.h5'
+    _classifier_graph_file_name = 'model_graph.json'
+    _classifier_weights_path = os.path.join(PARENT_DIR, 'genderteller/models', _classifier_weights_file_name)
+    _classifier_graph_path = os.path.join(PARENT_DIR, 'genderteller/models', _classifier_graph_file_name)
+
+    def __init__(self):
+        self._name_encoder = NameEncoder(lower=True, pad_size=103, padding='post')
+        self._gender_encoder = GenderEncoder()
+
+    def _encode_name(self, names, fit=False):
+        """ Encode the input names with NameEncoder. """
+        if fit:
+            self._name_encoder.fit(names)
+        encoded_names = self._name_encoder.encode(names)
+
+        return encoded_names
+
+    @classmethod
+    def load(cls):
+        K.clear_session()
+        with open(cls._classifier_graph_path, 'r') as f:
+            model_graph = f.read()
+        model = model_from_json(model_graph)
+        model.load_weights(cls._classifier_weights_path)
+        return model
+
+    def predict(self, model, names, return_prob=False, ptv_cutoff=gender_cutoff[1], ntv_cutoff=gender_cutoff[0]):
+        """ This function predicts the gender with given names. """
+        names = self._encode_name(names)
+        y_pred_prob = model.predict(names)
         y_pred_prob = y_pred_prob.flatten()
         y_pred = np.where(y_pred_prob >= ptv_cutoff, gender_class[1],
                           np.where(y_pred_prob >= ntv_cutoff, gender_class['unk'], gender_class[0]))
